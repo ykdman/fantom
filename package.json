@@ -1,0 +1,23 @@
+{
+  "name": "fantom",
+  "version": "1.0.0",
+  "description": "- 프로그래머스 풀스택 3기 과정 서브 프로젝트",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ykdman/fantom.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ykdman/fantom/issues"
+  },
+  "homepage": "https://github.com/ykdman/fantom#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
