@@ -24,3 +24,7 @@ app.use((req, res, next) => {
 app.post("/signup", userControllers.signupUser);
 
 app.post("/login", userControllers.loginUser);
+
+app.get("/users/:id", userControllers.getUser);
+
+app.delete("/users/:id", userControllers.deleteUser);

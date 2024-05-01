@@ -65,9 +65,65 @@ const signupUser = (req, res) => {
   }
 };
 
+/**
+ * 회원 개별 조회 API : GET
+ * @param {Request} req
+ * @param {Response} res
+ */
+const getUser = (req, res) => {
+  const { id } = req.params;
+  const dbUser = db.get(id);
+  const validReq = validRequest([id]);
+
+  if (!validReq) {
+    res.status(400).send("올바른 회원 id를 입력해주세요");
+    return;
+  }
+
+  //db에 회원 id가 없는 경우
+  if (!dbUser) {
+    res.status(404).send(`${id} 회원이 존재하지 않습니다.`);
+    return;
+  }
+
+  const user = {
+    id,
+    pwd: dbUser.pwd,
+    name: dbUser.name,
+  };
+  res.status(200).json(user);
+};
+
+/**
+ * 개별 회원 탈퇴 API : DELETE
+ * @param {Request} req
+ * @param {Response} res
+ */
+const deleteUser = (req, res) => {
+  const { id } = req.params;
+  const validReq = validRequest([id]);
+  if (!validReq) {
+    res.status(400).send("올바른 id를 입력해주세요");
+  }
+
+  const dbUser = db.get(id);
+
+  // 올바른 user 존재 시 삭제
+  if (dbUser) {
+    const userDeleteState = db.delete(id);
+    if (userDeleteState) {
+      res.status(200).send(`${id} 회원이 정상적으로 탈퇴 되었습니다.`);
+    } else {
+      res.status(505).send(`${id}의 탈퇴가 이루어지지 않았습니다.`);
+    }
+  }
+};
+
 module.exports = {
   loginUser,
   signupUser,
+  getUser,
+  deleteUser,
 };
 
 function validRequest() {
