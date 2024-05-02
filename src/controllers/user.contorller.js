@@ -1,15 +1,15 @@
 const db = require("../model/data.js");
-
+const utilFn = require("../utils/validRequest.js");
 /**
  * user 로그인 API : POST
  * @param {Request} req
  * @param {Response} res
- * @returns {Response}
+ * @returns
  */
 const loginUser = (req, res) => {
   const { id, pwd } = req.body;
-  console.log(typeof pwd);
-  const validReq = validRequest([id, pwd]);
+
+  const validReq = utilFn.validRequest([id, pwd]);
   const idExist = db.get(id);
 
   // 계정정보를 올바르게 입력 안했을때
@@ -44,7 +44,7 @@ const loginUser = (req, res) => {
  */
 const signupUser = (req, res) => {
   const { id, pwd, name } = req.body;
-  const validReq = validRequest([id, pwd, name]);
+  const validReq = utilFn.validRequest([id, pwd, name]);
 
   if (!validReq) {
     res.status(400).send("올바른 가입정보를 입력하세요");
@@ -73,7 +73,7 @@ const signupUser = (req, res) => {
 const getUser = (req, res) => {
   const { id } = req.params;
   const dbUser = db.get(id);
-  const validReq = validRequest([id]);
+  const validReq = utilFn.validRequest([id]);
 
   if (!validReq) {
     res.status(400).send("올바른 회원 id를 입력해주세요");
@@ -125,13 +125,3 @@ module.exports = {
   getUser,
   deleteUser,
 };
-
-function validRequest() {
-  for (const item of [...arguments]) {
-    if (typeof item === "undefined") {
-      return false;
-    }
-  }
-
-  return true;
-}
