@@ -33,8 +33,9 @@ app.post("/signup", userControllers.signupUser);
 // 로그인 Route
 app.post("/login", userControllers.loginUser);
 
-// 개별 회원 정보 조회 Route
-app.get("/users/:id", userControllers.getUser);
-
-// 개별 회원 탈퇴 (삭제) Route
-app.delete("/users/:id", userControllers.deleteUser);
+app
+  .route("/users/:email")
+  // 개별 회원 정보 조회 Route
+  // 개별 회원 탈퇴 (삭제) Route
+  .get(userControllers.getUser)
+  .delete(userControllers.deleteUser);
