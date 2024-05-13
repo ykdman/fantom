@@ -1,6 +1,7 @@
 // routes/page.router.js
 
 const express = require("express");
+const { body, check } = require("express-validator");
 
 const pagesRouter = express.Router();
 const pagesController = require("../controllers/pages.controller.js");
@@ -12,14 +13,26 @@ const pagesController = require("../controllers/pages.controller.js");
 pagesRouter
   .route("/")
   .get(pagesController.getPages)
-  .post(pagesController.createPage);
+  .post(
+    [
+      body("artist_id")
+        .isString()
+        .withMessage("아티스트 이름을 문자열로 입력하세요"),
+
+      body("user_id").isInt().withMessage("user_id를 숫자형으로 입력해주세요."),
+    ],
+    pagesController.createPage
+  );
 
 // /pages/:id 라우터
 // get
 // post
 pagesRouter
   .route("/:id")
-  .get(pagesController.getOnePage)
+  .get(
+    check("id").isNumeric().withMessage("올바른 페이지 id를 작성해주세요"),
+    pagesController.getOnePage
+  )
   .put(pagesController.updatePage)
   .delete(pagesController.deletePage);
 

@@ -1,6 +1,7 @@
 const db = require("../model/data.js");
 const utilFn = require("../utils/validRequest.js");
 const connection = require("../model/dbConnect.js");
+const { validationResult } = require("express-validator");
 
 /**
  * user 로그인 API : POST
@@ -115,6 +116,8 @@ const signupUser = (req, res) => {
  * @param {Response} res
  */
 const getUser = (req, res) => {
+  const err = validationResult(req);
+  console.log(err.array());
   const { email } = req.params;
   console.log(email);
   let sql = `SELECT * FROM users
@@ -167,10 +170,13 @@ const deleteUser = (req, res) => {
 
   let sql = `DELETE FROM users
     WHERE email = ?
-  `
+  `;
   connection.query(sql, email, (err, result) => {
-    
-  })
+    if (err) console.log(err.name, err.message);
+    else {
+      res.status(200).json({ message: "회원탈퇴가 완료 되었습니다." });
+    }
+  });
 
   // const dbUser = db.get(email);
 

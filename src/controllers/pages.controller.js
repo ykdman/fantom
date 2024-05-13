@@ -1,4 +1,6 @@
 const pageData = require("../model/pagesData.js");
+const connection = require("../model/dbConnect.js");
+const { validationResult } = require("express-validator");
 
 /**
  * pages 전체 조회 API
@@ -24,17 +26,37 @@ const getPages = (req, res) => {
  * @param {import("express").Response} res
  */
 const createPage = (req, res) => {
-  const { artistName, pageName, id } = req.body;
-  const pageExist = pageData.has(id);
-
-  if (!pageExist) {
-    pageData.set(id, { artistName, pageName });
-    res
-      .status(200)
-      .json({ id, artistName, pageName, message: `페이지 생성 완료 : ${id}` });
-  } else {
-    res.status(400).json({ message: "이미 존재하는 페이지 입니다." });
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    console.log(error.array());
+    return res.status(400).json(error.array());
   }
+  const { artist_id, user_id } = req.body;
+  let sql = `INSERT INTO pages 
+  (user_id, artist_id) 
+  VALUES 
+  (?, ? )`;
+  connection.query(sql, [+user_id, artist_id], (err, result) => {
+    if (err) {
+      console.log(err.name, err.message);
+      return res.status(500).json({ message: err.message });
+    } else {
+      return res
+        .status(200)
+        .json({ artist_id, user_id, msg: "page create success" });
+    }
+  });
+
+  // const pageExist = pageData.has(id);
+
+  // if (!pageExist) {
+  //   pageData.set(id, { artistName, pageName });
+  //   res
+  //     .status(200)
+  //     .json({ id, artistName, pageName, message: `페이지 생성 완료 : ${id}` });
+  // } else {
+  //   res.status(400).json({ message: "이미 존재하는 페이지 입니다." });
+  // }
 };
 
 /**
@@ -42,17 +64,40 @@ const createPage = (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-const getOnePage = (req, res) => {
-  console.log(req.params);
-  const { id } = req.params;
-  const page = pageData.get(id);
-
-  if (!page) {
-    res.status(404).json({ message: "페이지를 찾을 수 없습니다." });
-  } else {
-    const pageInfo = { id, ...page };
-    res.status(200).json(pageInfo);
+const getOnePage = (req, res, next) => {
+  console.log("get Page API");
+  // next();
+  const validError = validationResult(req);
+  if (!validError.isEmpty()) {
+    return res.status(400).json(validError.array());
   }
+  console.log(req.params);
+  console.log("Get PAge API 진행");
+
+  const { id } = req.params;
+  let sql = `SELECT * FROM pages 
+  WHERE id=?`;
+
+  connection.query(sql, id, (err, result) => {
+    console.log(result[0]);
+    if (err) {
+      return res
+        .status(400)
+        .json({ message: `${id} 페이지를 찾을 수 없습니다.` });
+    } else if (result[0]) {
+      const page = { ...result[0] };
+      return res.status(200).json({ ...page });
+    } else {
+      return res.status(404).json({ message: "페이지를 찾을 수 없습니다." });
+    }
+  });
+
+  // if (!page) {
+  //   res.status(404).json({ message: "페이지를 찾을 수 없습니다." });
+  // } else {
+  //   const pageInfo = { id, ...page };
+  //   res.status(200).json(pageInfo);
+  // }
 };
 
 /**
