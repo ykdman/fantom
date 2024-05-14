@@ -2,6 +2,9 @@ const db = require("../model/data.js");
 const utilFn = require("../utils/validRequest.js");
 const connection = require("../model/dbConnect.js");
 const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 /**
  * user 로그인 API : POST
@@ -18,7 +21,19 @@ const loginUser = (req, res) => {
     if (err) console.log(err.name, err.message);
     else {
       if (result[0] && result[0].pwd === pwd) {
-        res.status(201).json({ message: `${email} 님 로그인 되었습니다.` });
+        const logitUser = result[0];
+        // token 발급
+        const token = jwt.sign(
+          {
+            email: loginUser.email,
+            name: loginUser.name,
+          },
+          process.env.PRIVATE_KEY
+        );
+        // res.cookie()
+        res
+          .status(201)
+          .json({ message: `${email} 님 로그인 되었습니다.`, token });
       } else if (!result[0]) {
         res
           .status(404)

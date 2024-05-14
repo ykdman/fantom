@@ -66,12 +66,12 @@ const createPage = (req, res) => {
  */
 const getOnePage = (req, res, next) => {
   console.log("get Page API");
-  // next();
-  const validError = validationResult(req);
-  if (!validError.isEmpty()) {
-    return res.status(400).json(validError.array());
-  }
-  console.log(req.params);
+
+  // const validError = validationResult(req);
+  // if (!validError.isEmpty()) {
+  //   return res.status(400).json(validError.array());
+  // }
+
   console.log("Get PAge API 진행");
 
   const { id } = req.params;
