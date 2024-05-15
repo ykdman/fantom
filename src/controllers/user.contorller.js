@@ -17,29 +17,32 @@ const loginUser = (req, res) => {
   let sql = `
     SELECT * FROM users 
     WHERE email = '${email}'`;
+
   connection.query(sql, (err, result) => {
     if (err) console.log(err.name, err.message);
     else {
       if (result[0] && result[0].pwd === pwd) {
-        const logitUser = result[0];
+        const loginUser = result[0];
+        console.log(loginUser);
         // token 발급
         const token = jwt.sign(
           {
             email: loginUser.email,
             name: loginUser.name,
           },
-          process.env.PRIVATE_KEY
+          process.env.PRIVATE_KEY,
+          { expiresIn: "3m", issuer: "kdman" }
         );
-        // res.cookie()
-        res
-          .status(201)
-          .json({ message: `${email} 님 로그인 되었습니다.`, token });
+        // token 을 cookie 에 담기
+        console.log(token);
+        res.cookie("token", token, { httpOnly: true });
+        res.status(201).json({ message: `${email} 님 로그인 되었습니다.` });
       } else if (!result[0]) {
         res
           .status(404)
           .json({ message: `${email} 회원 정보를 찾지 못했습니다.` });
       } else if (result[0].pwd !== pwd) {
-        res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
+        res.status(403).json({ message: "비밀번호가 일치하지 않습니다." });
       }
     }
   });
